@@ -27,7 +27,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
       >
-        <header className="bg-black text-white text-2xl font-medium p-4 text-center">
+        <header className="text-2xl font-medium text-white p-4">
           Connect 4 game
         </header>
         {children}

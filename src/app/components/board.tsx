@@ -27,39 +27,40 @@ export default function Board() {
   } = useConnect4();
 
   return (
-    <div className="relative font-sans items-center justify-items-center flex-1 p-4 gap-16 sm:p-20 bg-gray-200">
+    <div className="relative flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-blue-100 flex-1">
       {/* Current player label */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-lg font-semibold text-black">Current turn:</span>
-        <span className={`font-bold ${PLAYER_TEXT_COLORS[player]}`}>
+      <div className="mb-6 flex items-center gap-3">
+        <span className="text-xl font-semibold text-gray-800">
+          Current turn:
+        </span>
+        <span
+          className={`font-bold text-xl px-4 py-1 rounded-full ${PLAYER_TEXT_COLORS[player]} bg-white`}
+        >
           Player {player}
         </span>
         <span
-          className={`inline-block w-4 h-4 rounded-full ml-1 ${PLAYER_COLORS[player]}`}
+          className={`inline-block w-6 h-6 rounded-full border-2 border-white shadow-lg ${PLAYER_COLORS[player]} animate-pulse`}
         ></span>
       </div>
-      {/* Message display */}
-      {message && !winner && !isDraw && (
-        <div className="mb-2 text-center text-blue-700 font-medium">
-          {message}
-        </div>
-      )}
+
       {/* Arrow row */}
       <div
-        className="grid grid-cols-7 gap-3 h-10 px-6"
+        className="grid grid-cols-7 gap-3 h-12 px-6"
         style={{ width: "612px" }}
       >
         {Array.from({ length: numCols }).map((_, colIdx) => (
           <div key={colIdx} className="flex items-center justify-center">
             {hoveredCol === colIdx ? (
-              <span className="text-2xl text-blue-500">↓</span>
+              <span className="text-3xl text-blue-500 animate-bounce">⬇️</span>
             ) : null}
           </div>
         ))}
       </div>
-      <div className="flex flex-col items-center justify-center bg-blue-500 px-6 py-4 rounded-xl">
+
+      {/* Board */}
+      <div className="flex flex-col items-center justify-center">
         <div
-          className={`grid grid-cols-7 gap-2 transition-all duration-200 ${
+          className={`relative grid grid-cols-7 gap-2 p-4 rounded-3xl shadow-2xl bg-blue-500 border-4 border-blue-800 transition-all duration-200 ${
             winner || isDraw ? "opacity-50 pointer-events-none" : ""
           }`}
           style={{ width: "564px" }}
@@ -67,7 +68,7 @@ export default function Board() {
           {board.flatMap((row: Cell[], rowIdx: number) =>
             row.map((cell: Cell, colIdx: number) => {
               const idx = rowIdx * numCols + colIdx;
-              let cellColor = "bg-gray-200";
+              let cellColor = "bg-gray-100";
               if (cell === "A") cellColor = PLAYER_COLORS.A;
               if (cell === "B") cellColor = PLAYER_COLORS.B;
               const highlight =
@@ -75,14 +76,18 @@ export default function Board() {
               const isNotWinner =
                 winner && !winnerCoords.includes(`${rowIdx},${colIdx}`);
 
-              if (isNotWinner) {
-                cellColor += " opacity-40";
-              }
-
               return (
                 <div
                   key={idx}
-                  className={`w-15 h-15 border border-gray-400 rounded-full transition-all duration-150 ${cellColor} ${highlight} cursor-pointer`}
+                  className={`w-16 h-16 border-2 border-blue-900 rounded-full shadow-inner flex items-center justify-center transition-all duration-150 ${cellColor} ${highlight} cursor-pointer ${
+                    isNotWinner ? "opacity-40" : ""
+                  }`}
+                  style={{
+                    boxShadow:
+                      cell !== ""
+                        ? "0 2px 8px 0 rgba(0,0,0,0.15) inset"
+                        : "0 1px 4px 0 rgba(0,0,0,0.08) inset",
+                  }}
                   onMouseEnter={() => setHoveredCol(colIdx)}
                   onMouseLeave={() => setHoveredCol(null)}
                   onClick={() => play(colIdx)}
@@ -92,35 +97,41 @@ export default function Board() {
           )}
         </div>
       </div>
+
       {/* Winner/Draw Modal */}
       {(winner || isDraw) && (
-        <div className="fixed inset-0 flex items-start justify-center bg-black/30 z-10 pt-15">
-          <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
-            <span className="text-2xl font-bold mb-2 text-black">
+        <div className="fixed inset-0 flex items-start justify-center bg-black/40 z-20 pt-6">
+          <div className="bg-white rounded-2xl shadow-2xl p-10 flex flex-col items-center border-4 border-blue-300">
+            <span className="text-4xl font-extrabold mb-4 text-gray-800 flex items-center gap-2">
               {winner ? (
                 <>
-                  Player{" "}
-                  <span className={PLAYER_TEXT_COLORS[winner]}> {winner} </span>{" "}
+                  🏆 Player
+                  <span className={PLAYER_TEXT_COLORS[winner]}> {winner} </span>
                   wins!
                 </>
               ) : (
-                <>Nobody won!</>
+                <>🤝 It&apos;s a draw! Nobody won!</>
               )}
             </span>
             {winner && (
               <span
-                className={`inline-block w-8 h-8 rounded-full mb-4 ${PLAYER_COLORS[winner]}`}
+                className={`inline-block w-12 h-12 rounded-full mb-6 border-4 border-blue-200 ${PLAYER_COLORS[winner]}`}
               ></span>
             )}
-            {message && (
-              <span className="mb-4 text-blue-700 font-medium">{message}</span>
-            )}
             <button
-              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold cursor-pointer"
+              className="px-8 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 font-bold text-lg shadow transition cursor-pointer"
               onClick={reset}
             >
               RESET
             </button>
+          </div>
+        </div>
+      )}
+      {/* Floating Toast for message */}
+      {message && !winner && !isDraw && (
+        <div className="fixed bottom-2 left-1/2 transform -translate-x-1/2 z-30">
+          <div className="bg-orange-100 text-orange-500 px-6 py-3 rounded-full shadow-lg text-lg font-semibold animate-fade-in">
+            {message}
           </div>
         </div>
       )}
