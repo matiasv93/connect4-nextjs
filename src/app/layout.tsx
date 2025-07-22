@@ -25,8 +25,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col h-screen`}
       >
+        <header className="bg-black text-white text-2xl font-medium p-4 text-center">
+          Connect 4 game
+        </header>
         {children}
       </body>
     </html>
