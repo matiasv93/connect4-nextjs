@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useConnect4 } from "../hooks/useConnect4";
 import type { Cell, Player } from "../services/connect4";
+import { log } from "console";
 
 const PLAYER_COLORS: Record<Player, string> = {
   A: "bg-red-500",
@@ -14,7 +15,8 @@ const PLAYER_TEXT_COLORS: Record<Player, string> = {
 
 export default function Board() {
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
-  const { board, player, winner, numCols, play, reset } = useConnect4();
+  const { board, player, winner, winnerCoords, numCols, play, reset } =
+    useConnect4();
 
   return (
     <div className="relative font-sans items-center justify-items-center flex-1 p-4 gap-16 sm:p-20 bg-gray-200">
@@ -56,6 +58,13 @@ export default function Board() {
               if (cell === "B") cellColor = PLAYER_COLORS.B;
               const highlight =
                 hoveredCol === colIdx ? "ring-4 ring-blue-300" : "";
+              const isNotWinner =
+                winner && !winnerCoords.includes(`${rowIdx},${colIdx}`);
+
+              if (isNotWinner) {
+                cellColor += " opacity-40";
+              }
+
               return (
                 <div
                   key={idx}

@@ -17,6 +17,7 @@ export class Connect4 {
   board: Cell[][];
   player: Player;
   winner?: Player;
+  winnerCoords?: [number, number][];
 
   constructor() {
     this.board = new Array(LINES_Y)
@@ -58,46 +59,64 @@ export class Connect4 {
     const diagonalLeft: Cell[] = [];
     const diagonalRight: Cell[] = [];
 
+    const horizontalCoords: [number, number][] = [];
+    const verticalCoords: [number, number][] = [];
+    const diagonalLeftCoords: [number, number][] = [];
+    const diagonalRightCoords: [number, number][] = [];
+
     for (let pos = -3; pos <= 3; pos++) {
       horizontal.push(this.board[row]?.[col + pos] ?? "");
+      horizontalCoords.push([row, col + pos]);
       vertical.push(this.board[row + pos]?.[col] ?? "");
+      verticalCoords.push([row + pos, col]);
       diagonalLeft.push(this.board[row + pos]?.[col + pos] ?? "");
+      diagonalLeftCoords.push([row + pos, col + pos]);
       diagonalRight.push(this.board[row + pos]?.[col - pos] ?? "");
+      diagonalRightCoords.push([row + pos, col - pos]);
     }
 
-    const check4 = (arr: Cell[], player: Player): boolean => {
+    const check4 = (
+      arr: Cell[],
+      coords: [number, number][],
+      player: Player
+    ): [boolean, [number, number][]] => {
       let count = 0;
-
       for (let i = 0; i < arr.length; i++) {
         if (arr[i] === player) {
           count++;
-          if (count === 4) return true;
+          if (count === 4) {
+            return [true, coords.slice(i - 3, i + 1)];
+          }
         } else {
           count = 0;
         }
       }
-
-      return false;
+      return [false, []];
     };
 
-    if (check4(horizontal, player)) {
-      console.log("WON horizontal");
+    let result: [boolean, [number, number][]];
+    result = check4(horizontal, horizontalCoords, player);
+    if (result[0]) {
       this.winner = player;
+      this.winnerCoords = result[1];
       return;
     }
-    if (check4(vertical, player)) {
-      console.log("WON vertical");
+    result = check4(vertical, verticalCoords, player);
+    if (result[0]) {
       this.winner = player;
+      this.winnerCoords = result[1];
       return;
     }
-    if (check4(diagonalLeft, player)) {
-      console.log("WON diagonalLeft");
+    result = check4(diagonalLeft, diagonalLeftCoords, player);
+    if (result[0]) {
       this.winner = player;
+      this.winnerCoords = result[1];
       return;
     }
-    if (check4(diagonalRight, player)) {
-      console.log("WON diagonalRight");
+    result = check4(diagonalRight, diagonalRightCoords, player);
+    if (result[0]) {
       this.winner = player;
+      this.winnerCoords = result[1];
       return;
     }
   }

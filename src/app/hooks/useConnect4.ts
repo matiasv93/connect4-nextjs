@@ -8,12 +8,18 @@ export function useConnect4() {
   );
   const [player, setPlayer] = useState<Player>(game.player);
   const [winner, setWinner] = useState<Player | undefined>(game.winner);
-
+  const [winnerCoords, setWinnerCoords] = useState<string[]>([]);
   const play = (col: number) => {
     game.play(col);
     setBoard(game.board.map((row) => [...row])); // force new reference
     setPlayer(game.player);
-    setWinner(game.winner);
+
+    if (game.winner) {
+      setWinner(game.winner);
+      const joinedWinnerCoords =
+        game.winnerCoords?.map(([x, y]) => `${x},${y}`) || [];
+      setWinnerCoords(joinedWinnerCoords);
+    }
   };
 
   const reset = () => {
@@ -22,9 +28,10 @@ export function useConnect4() {
     setBoard(newGame.board.map((row) => [...row]));
     setPlayer(newGame.player);
     setWinner(newGame.winner);
+    setWinnerCoords([]);
   };
   const numRows = board.length;
   const numCols = board[0]?.length || 0;
 
-  return { board, player, winner, numRows, numCols, play, reset };
+  return { board, player, winner, winnerCoords, numRows, numCols, play, reset };
 }
