@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  Connect4,
-  PLAYER_A,
-  PLAYER_B,
-  Player,
-  Cell,
-} from "../services/connect4";
+import { Connect4, Player, Cell } from "../services/connect4";
 
 export function useConnect4() {
   const [game, setGame] = useState(() => new Connect4());
