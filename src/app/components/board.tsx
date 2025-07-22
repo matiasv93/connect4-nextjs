@@ -46,12 +46,12 @@ export default function Board() {
       {/* Arrow row */}
       <div
         className="grid grid-cols-7 gap-3 h-12 px-6"
-        style={{ width: "612px" }}
+        style={{ width: "564px" }}
       >
         {Array.from({ length: numCols }).map((_, colIdx) => (
           <div key={colIdx} className="flex items-center justify-center">
             {hoveredCol === colIdx ? (
-              <span className="text-3xl text-blue-500 animate-bounce">⬇️</span>
+              <span className="text-3xl text-blue-500 animate-bounce">▼</span>
             ) : null}
           </div>
         ))}
@@ -60,7 +60,7 @@ export default function Board() {
       {/* Board */}
       <div className="flex flex-col items-center justify-center">
         <div
-          className={`relative grid grid-cols-7 gap-2 p-4 rounded-3xl shadow-2xl bg-blue-500 border-4 border-blue-800 transition-all duration-200 ${
+          className={`relative grid grid-cols-7 gap-2 p-4 rounded-3xl shadow-2xl bg-blue-500 border-2 border-blue-800 transition-all duration-200 ${
             winner || isDraw ? "opacity-50 pointer-events-none" : ""
           }`}
           style={{ width: "564px" }}
