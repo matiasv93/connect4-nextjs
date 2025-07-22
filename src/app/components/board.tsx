@@ -51,7 +51,11 @@ export default function Board() {
         {Array.from({ length: numCols }).map((_, colIdx) => (
           <div key={colIdx} className="flex items-center justify-center">
             {hoveredCol === colIdx ? (
-              <span className="text-3xl text-blue-500 animate-bounce">▼</span>
+              <span
+                className={`text-3xl animate-bounce ${PLAYER_TEXT_COLORS[player]}`}
+              >
+                ▼
+              </span>
             ) : null}
           </div>
         ))}
