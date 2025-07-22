@@ -1,11 +1,11 @@
 // GAME
 // 2 players (A/B)
 // turn
-// coin positions (10x10 matrix)
+// coin positions (7x7 matrix)
 // win who get 4 coins in a line
 
-const LINES_X = 10;
-const LINES_Y = 12;
+const LINES_X = 7;
+const LINES_Y = 7;
 
 export type Player = "A" | "B";
 export type Cell = Player | "";
