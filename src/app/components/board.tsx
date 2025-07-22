@@ -1,53 +1,95 @@
 "use client";
 import { useState } from "react";
-import { Connect4, Player, PLAYER_A, PLAYER_B } from "../services/connect4";
+import { useConnect4 } from "../hooks/useConnect4";
+import type { Cell, Player } from "../services/connect4";
 
-const PLAYER_COLORS = {
-  [PLAYER_A]: "bg-red-500",
-  [PLAYER_B]: "bg-yellow-500",
+const PLAYER_COLORS: Record<Player, string> = {
+  A: "bg-red-500",
+  B: "bg-yellow-400",
+};
+const PLAYER_TEXT_COLORS: Record<Player, string> = {
+  A: "text-red-600",
+  B: "text-yellow-600",
 };
 
 export default function Board() {
-  const [game] = useState<Connect4>(new Connect4());
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
+  const { board, player, winner, numCols, play, reset } = useConnect4();
 
   return (
-    <div className="font-sans items-center justify-items-center flex-1 p-4 gap-16 sm:p-20 bg-gray-200">
+    <div className="relative font-sans items-center justify-items-center flex-1 p-4 gap-16 sm:p-20 bg-gray-200">
+      {/* Current player label */}
+      <div className="mb-4 flex items-center gap-2">
+        <span className="text-lg font-semibold text-black">Current turn:</span>
+        <span className={`font-bold ${PLAYER_TEXT_COLORS[player]}`}>
+          Player {player}
+        </span>
+        <span
+          className={`inline-block w-4 h-4 rounded-full ml-1 ${PLAYER_COLORS[player]}`}
+        ></span>
+      </div>
       {/* Arrow row */}
       <div
         className="grid grid-cols-7 gap-3 h-10 px-6"
-        style={{ width: "564px" }}
+        style={{ width: "612px" }}
       >
-        {game.board.map((_, colIdx) => (
+        {Array.from({ length: numCols }).map((_, colIdx) => (
           <div key={colIdx} className="flex items-center justify-center">
             {hoveredCol === colIdx ? (
-              <span className="text-3xl text-blue-500">↓</span>
+              <span className="text-2xl text-blue-500">↓</span>
             ) : null}
           </div>
         ))}
       </div>
       <div className="flex flex-col items-center justify-center bg-blue-500 px-6 py-4 rounded-xl">
-        <div className="grid grid-cols-7 gap-y-3 gap-x-4">
-          {game.board.flatMap((row, rowIdx) =>
-            row.map((cell, colIdx) => {
-              // Calculate the index for the flat array
-              const idx = rowIdx * game.board.length + colIdx;
-              const cellColor = PLAYER_COLORS[cell as Player] || "bg-gray-200";
-              // Highlight column on hover
+        <div
+          className={`grid grid-cols-7 gap-2 transition-all duration-200 ${
+            winner ? "opacity-50 pointer-events-none" : ""
+          }`}
+          style={{ width: "564px" }}
+        >
+          {board.flatMap((row: Cell[], rowIdx: number) =>
+            row.map((cell: Cell, colIdx: number) => {
+              const idx = rowIdx * numCols + colIdx;
+              let cellColor = "bg-gray-200";
+              if (cell === "A") cellColor = PLAYER_COLORS.A;
+              if (cell === "B") cellColor = PLAYER_COLORS.B;
               const highlight =
-                hoveredCol === colIdx ? "ring-4 ring-blue-400" : "";
+                hoveredCol === colIdx ? "ring-4 ring-blue-300" : "";
               return (
                 <div
                   key={idx}
                   className={`w-15 h-15 border border-gray-400 rounded-full transition-all duration-150 ${cellColor} ${highlight} cursor-pointer`}
                   onMouseEnter={() => setHoveredCol(colIdx)}
                   onMouseLeave={() => setHoveredCol(null)}
+                  onClick={() => play(colIdx)}
                 ></div>
               );
             })
           )}
         </div>
       </div>
+      {/* Winner Modal */}
+      {winner && (
+        <div className="fixed inset-0 flex items-start justify-center bg-black/30 z-10 pt-15">
+          <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
+            <span className="text-2xl font-bold mb-2 text-black">
+              Player{" "}
+              <span className={PLAYER_TEXT_COLORS[winner]}> {winner} </span>{" "}
+              wins!
+            </span>
+            <span
+              className={`inline-block w-8 h-8 rounded-full mb-4 ${PLAYER_COLORS[winner]}`}
+            ></span>
+            <button
+              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold cursor-pointer"
+              onClick={reset}
+            >
+              RESET
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
