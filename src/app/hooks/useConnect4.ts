@@ -9,7 +9,15 @@ export function useConnect4() {
   const [player, setPlayer] = useState<Player>(game.player);
   const [winner, setWinner] = useState<Player | undefined>(game.winner);
   const [winnerCoords, setWinnerCoords] = useState<string[]>([]);
+  const [message, setMessage] = useState<string>("");
+
   const play = (col: number) => {
+    if (winner || game.isDraw) return;
+    // If column is full, show message
+    if (board[0][col] !== "") {
+      setMessage("Column is full! Try another column.");
+      return;
+    }
     game.play(col);
     setBoard(game.board.map((row) => [...row])); // force new reference
     setPlayer(game.player);
@@ -19,6 +27,11 @@ export function useConnect4() {
       const joinedWinnerCoords =
         game.winnerCoords?.map(([x, y]) => `${x},${y}`) || [];
       setWinnerCoords(joinedWinnerCoords);
+      setMessage(`Player ${game.winner} wins!`);
+    } else if (game.isDraw) {
+      setMessage("It's a draw! Nobody won.");
+    } else {
+      setMessage("");
     }
   };
 
@@ -29,9 +42,21 @@ export function useConnect4() {
     setPlayer(newGame.player);
     setWinner(newGame.winner);
     setWinnerCoords([]);
+    setMessage("");
   };
   const numRows = board.length;
   const numCols = board[0]?.length || 0;
 
-  return { board, player, winner, winnerCoords, numRows, numCols, play, reset };
+  return {
+    board,
+    player,
+    winner,
+    winnerCoords,
+    numRows,
+    numCols,
+    play,
+    reset,
+    isDraw: game.isDraw,
+    message,
+  };
 }

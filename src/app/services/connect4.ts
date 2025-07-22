@@ -28,10 +28,9 @@ export class Connect4 {
 
   play(col: number): void {
     let lastMove: [number, number] | undefined;
-    if (this.winner) {
-      console.log("Skipping, Game over");
-      return;
-    }
+
+    // Prevent play if already winner or the column is full
+    if (this.winner || this.board[0][col]) return;
 
     for (let row = this.board.length - 1; row >= 0; row--) {
       if (!this.board[row][col]) {
@@ -45,10 +44,7 @@ export class Connect4 {
       this.checkWinner(lastMove[0], lastMove[1], this.player);
     }
 
-    if (this.winner) {
-      console.log("Game over, winner: ", this.winner);
-      return;
-    }
+    if (this.winner) return;
 
     this.player = this.player === PLAYER_A ? PLAYER_B : PLAYER_A;
   }
@@ -121,11 +117,8 @@ export class Connect4 {
     }
   }
 
-  print(): void {
-    console.log("PLAYER: ", this.player);
-    console.log("WINNER: ", this.winner);
-    console.table(this.board);
+  get isDraw(): boolean {
+    if (this.winner) return false;
+    return this.board.every((row) => row.every((cell) => cell !== ""));
   }
 }
-
-export const game = new Connect4();

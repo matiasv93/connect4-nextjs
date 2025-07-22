@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { useConnect4 } from "../hooks/useConnect4";
 import type { Cell, Player } from "../services/connect4";
-import { log } from "console";
 
 const PLAYER_COLORS: Record<Player, string> = {
   A: "bg-red-500",
@@ -15,8 +14,17 @@ const PLAYER_TEXT_COLORS: Record<Player, string> = {
 
 export default function Board() {
   const [hoveredCol, setHoveredCol] = useState<number | null>(null);
-  const { board, player, winner, winnerCoords, numCols, play, reset } =
-    useConnect4();
+  const {
+    board,
+    player,
+    winner,
+    winnerCoords,
+    numCols,
+    play,
+    reset,
+    isDraw,
+    message,
+  } = useConnect4();
 
   return (
     <div className="relative font-sans items-center justify-items-center flex-1 p-4 gap-16 sm:p-20 bg-gray-200">
@@ -30,6 +38,12 @@ export default function Board() {
           className={`inline-block w-4 h-4 rounded-full ml-1 ${PLAYER_COLORS[player]}`}
         ></span>
       </div>
+      {/* Message display */}
+      {message && !winner && !isDraw && (
+        <div className="mb-2 text-center text-blue-700 font-medium">
+          {message}
+        </div>
+      )}
       {/* Arrow row */}
       <div
         className="grid grid-cols-7 gap-3 h-10 px-6"
@@ -46,7 +60,7 @@ export default function Board() {
       <div className="flex flex-col items-center justify-center bg-blue-500 px-6 py-4 rounded-xl">
         <div
           className={`grid grid-cols-7 gap-2 transition-all duration-200 ${
-            winner ? "opacity-50 pointer-events-none" : ""
+            winner || isDraw ? "opacity-50 pointer-events-none" : ""
           }`}
           style={{ width: "564px" }}
         >
@@ -78,18 +92,29 @@ export default function Board() {
           )}
         </div>
       </div>
-      {/* Winner Modal */}
-      {winner && (
+      {/* Winner/Draw Modal */}
+      {(winner || isDraw) && (
         <div className="fixed inset-0 flex items-start justify-center bg-black/30 z-10 pt-15">
           <div className="bg-white rounded-lg shadow-lg p-8 flex flex-col items-center">
             <span className="text-2xl font-bold mb-2 text-black">
-              Player{" "}
-              <span className={PLAYER_TEXT_COLORS[winner]}> {winner} </span>{" "}
-              wins!
+              {winner ? (
+                <>
+                  Player{" "}
+                  <span className={PLAYER_TEXT_COLORS[winner]}> {winner} </span>{" "}
+                  wins!
+                </>
+              ) : (
+                <>Nobody won!</>
+              )}
             </span>
-            <span
-              className={`inline-block w-8 h-8 rounded-full mb-4 ${PLAYER_COLORS[winner]}`}
-            ></span>
+            {winner && (
+              <span
+                className={`inline-block w-8 h-8 rounded-full mb-4 ${PLAYER_COLORS[winner]}`}
+              ></span>
+            )}
+            {message && (
+              <span className="mb-4 text-blue-700 font-medium">{message}</span>
+            )}
             <button
               className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold cursor-pointer"
               onClick={reset}
